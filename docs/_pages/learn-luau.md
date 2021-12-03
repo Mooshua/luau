@@ -85,7 +85,9 @@ You're done *MAKING THE COOKIES!*
 
 Now that we have written out all of our instructions, CookieBot will read our instructions from top-to-bottom, and will do exactly what we ask it do to. We could have CookieBot keep the cookies in the oven for two hours if we wanted it to!
 
-We have just discovered 
+We have just discovered basic programming syntax. In reality, this way of programming is not far off from how Luau comprehends and runs code.
+
+> **Syntax:** Special symbols and words used in a programming language, like `+`, `*`, and `function`
 
 ## Basic Types
 
@@ -146,6 +148,18 @@ We can also use exponents, including `e`.
 number = 2^64
 number_2 = 2.35e+19
 ```
+
+Luau has some aditional symbols we can use for math: `+=`, `-=`, `*=`, et cetera. Let's take a peek at how these are used.
+
+```lua
+my_number = 17
+
+--  These two are EXACTLY the same!
+my_number = my_number * 4
+my_number *= 4
+```
+
+Using these symbols can be quicker and easier than writing it out yourself.
 
 ## Tables
 
@@ -280,8 +294,6 @@ a, b, c = 4, 38, "Pineapple"
 
 ```
 
-We can also set variables as `local`, which we will learn about later.
-
 ## Functions
 
 As we learned with CookieBot, functions are a great way to organize repetitive routines. In Lua, functions are very comphrehensive, and allow you to do almost anything. 
@@ -325,7 +337,7 @@ my_value = get_one_number()
 first_number, second_number, third_number = get_three_numbers()
 ```
 
-Now, let's write our first function! We will begin by meeting some new people:
+Now, let's write our first function! We will begin by meeting some new people. We will accept a single argument, `name`, and use the `return` keyword to pass our greeting back to our code once the function is complete.
 
 ```lua
 function meet_new_person(name)
@@ -337,6 +349,23 @@ greetings = {
     meet_new_person("bob"),
 }
 ```
+
+Great! Now, let's take a closer look at what we just did.
+
+When we created our function, we accepted a single argument, called `name`. From this point forwards, `name` becomes a variable in the function. We can use it, so long as we provide an argument to our function when we tell Luau to execute it. If we don't provide an argument, we might run into some issues down the line.
+
+```lua
+meet_new_person("alice")
+meet_new_person()   --  Error! Attempt to concatenate nil with string.
+```
+
+We can also provide more arguments for our functions than the function will use. If this is the case, Luau will throw away any extra values.
+
+```lua
+meet_new_person("alice", "bob") --  "bob" goes unused.
+```
+
+### Anonymous functions & values
 
 Functions are very versatile. For example, here's an *anonymous* function:
 ```lua
@@ -356,4 +385,162 @@ meet_new_person_var = meet_new_person
 -- Note! this is what luau assumes you want to do when you do not include parenthesis.
 ```
 
+### Table Methods
 
+Luau has a lot of syntax sugar when it comes to creating functions. Let's take a quick second to look at how we can make writing and using Luau functions more enjoyable.
+
+Tables are a huge part about how we work with functions. When we organize code into multiple files, we want to be able to share code between files easily. Instead of explicitly taking each function from a file, we can bundle all of our functions into a table and use it that way.
+
+We can start by defining our table, and then use `function Table.Index(args...)` to write our functions.
+
+```lua
+module = {}
+
+function Module.sayHello(name)
+    return "Hello, " .. name
+end
+
+Module.sayHello("bob")
+```
+
+### Self
+
+Luau has one more trick up it's sleve: `:`! `:` is a special operator, sometimes called the `self` operator, which allows you to write *Object-oriented code* easier.
+
+> **Object Oriented Code:** Instead of writing code in functions, you will create tables that contain all the functions you need.
+
+When we use `:`, we tell Luau that we would like to tell the function we are using what table it is currently in. Take this example:
+
+```lua
+module = {}
+
+function Module.createGreeter(name)
+
+    local greeter = {
+        name = name
+    }
+
+    function greeter:SayHello(newName)
+        return "Hello, " .. newName .. "! My name is " .. self.name .. "! Nice to meet you :)"
+    end
+
+    return greeter
+
+end
+
+my_greeter = Module.createGreeter("bob")
+my_other_greeter = Module.createGreeter("alice")
+
+my_greeter:SayHello("alice")
+my_other_greeter:SayHello("bob")
+```
+
+> **Note:** See that `local` right there? Take notes! We're going to be learning what this does in the next section.
+
+We have created two tables! Each of these `greeter` tables has a function inside of it, called `SayHello`. If we were to call `my_greeter.SayHello()`, `SayHello()` would not know it was a value in a table! When we use `my_greeter:SayHello()`, we tell Luau to set `self` to `my_greeter`, so that the function can automate certain tasks. In reality, when we use `my_greeter:SayHello` to *create* a function, Luau really just adds a new argument, called "self", to the beginning of our argument list.
+
+Here's another example:
+```lua
+
+function my_func(self, arg1)
+    print("self = ", self)
+    print("arg1 = ", arg1)
+end
+
+my_table = {
+    my_func = my_func
+}
+
+function my_table:my_func_two(arg1)
+    print("self = ", self)
+    print("arg1 = ", arg1)
+end
+
+--  These four function executions are EXACTLY the same!
+my_table.my_func(my_table, 5)
+my_table:my_func(5)
+
+my_table.my_func_two(my_table,5)
+my_table:my_func_two(5)
+```
+Notice how `:` and `.` can be used interchangeably. This makes `self` functions very versatile. While they may seem complex and pointless at first, but this syntax shortcut will become your best friend as you explore advanced concepts of Luau programming.
+
+## Local Variables
+
+We can also set variables as `local`. Local variables are neat ways to organize your variables. So far, we've been working with *global* variables, which can get messy.
+Here's an example: In this function, we want to say hello to people using a global variable.
+```lua
+function say_hello(person)
+    greeting = "Nice to meet you, ".. person
+    return greeting
+end
+
+print (say_hello("Jack"))
+print (say_hello("Jane"))
+
+--!!!
+print (greeting)
+```
+But wait! because we used a *global* variable, our *greeting* variable has escaped into the rest of our code, instead of staying contained within the function.
+This is why global variables are not ideal--They are shared between all functions, and can be slow to use!
+
+Let's look at the same example, but with local variables.
+
+```lua
+function say_hello(person)
+    local greeting = "Nice to meet you, ".. person
+    return greeting
+end
+
+print (say_hello("Jack"))
+print (say_hello("Jane"))
+
+--This errors, because "greeting" cannot be found!
+print (greeting)
+```
+
+Now, `greeting` is contained within our function. It cannot escape to mess with other bits of our code. Local variables are a lot faster than global variables, so ideally you should *only* use local variables.
+
+*Functions can be local too!* Lua has some neat syntax sugar specifically for creating "local" functions.
+
+```lua
+local function local_function()
+
+end
+```
+
+These functions are normal local variables (just like `local local_function = function() .. end`). 
+
+## Upvalues
+
+Upvalues are an awesome tool Luau gives programmers. Let's take a look at an example where upvalues are useful:
+
+```lua
+local function create_counter()
+    local value = 0
+    return {
+        increment = function()
+            value += 1
+        end,
+        decrement = function()
+            value -= 1
+        end,
+    }
+end
+```
+
+Of course, we could write this out using tables, `:`, and `self`, but this is a lot quicker. Taking a closer look, however, there *should* be a problem with this code.
+```lua
+    ...
+    --  Okay, so we define "value" here.
+    local value = 0
+    return {
+        increment = function()  -- And we create a new function
+            --  But wait! "value" does not belong to "increment"!
+            --  It was defined in a different function!
+            --  This should cause an error, right?
+            value += 1
+        end,
+        ...
+```
+Fortunately, Luau takes care of all this for us, and it has a name: Upvalues! No matter where `increment` or `decrement` go in your code, they will all still be associated with the same number. Phew!
