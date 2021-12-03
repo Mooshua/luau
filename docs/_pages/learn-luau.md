@@ -6,7 +6,7 @@ toc: true
 
 
 
-Luau can be a tricky language to learn for people who have never written code before. This tutorial is aimed for absolute beginners, especially those who have never written a line of code before.
+Luau can be a tricky language to learn for people who have never written code before. This tutorial is aimed for absolute beginners, especially those who have never written a line of code before. More advanced users can skip to [Static Typing with Cookiebot](#static-typing-butter--cookiebot) for Luau-specific information.
 
 ## Getting Started: Recipes & CookieBot
 
@@ -167,11 +167,11 @@ Using these symbols can be quicker and easier than writing it out yourself.
 
 Tables store information in a key-value format, which is a very intuitive way of storing information. Here's an example:
 
-| Key       | Value         |
-|-----------|-------        |
-| Enemy     | "Alice"       |
-| Friend    | "Bob"         |
-| Number    | 1.844674e+19  |
+| Key    | Value        |
+| ------ | ------------ |
+| Enemy  | "Alice"      |
+| Friend | "Bob"        |
+| Number | 1.844674e+19 |
 
 At first, this may seem counter-intuitive, but it can be very useful, especially when you want to store multiple enemies and friends.
 
@@ -544,3 +544,30 @@ Of course, we could write this out using tables, `:`, and `self`, but this is a 
         ...
 ```
 Fortunately, Luau takes care of all this for us, and it has a name: Upvalues! No matter where `increment` or `decrement` go in your code, they will all still be associated with the same number. Phew!
+
+## Static Typing: Butter & CookieBot
+
+After the smashing hit of CookieBot 3, Cookies Incorporated realized how useful CookieBot could be in the everyday kitchen. People loved eating food, but didn't necessarily enjoy making it--CookieBot 4 needed to pounce on this new market! CookieBot 4 would feature new kitchen tools like frying pans, deep fryers, and pots, with more ingredients like broth, cheese, and fruit.
+
+As such, CookieBot's engineers have chosen to add Luau as a programming language for CookieBot, so chefs could write more advanced recipes like Beef Wellington, which surpassed the ability of CookieBot's current, basic recipe markup.
+
+CookieBot 4 releases to amateur chefs everywhere, and is a smashing success. However, soon after production, CookieBot's engineers get flooded with emails asking why their code wasn't working! Why?
+
+```lua
+local Bowl = CookieBot:FindBowl()
+local Butter = CookieBot:FindIngredient("butter", Cups(2))
+local Sugar = CookieBot:FindIngredient("sugar", Cups(2))
+
+Sugar:PlaceInto(Bowl)
+Butter:PlaceInto(Bowl)
+
+Bowl:MixUntil(MixConditions.Fluffy)
+```
+
+CookieBot 4 wasn't the problem here--It was the user's code! `:FindIngredient()` wasn't supposed to accept a string as the first argument--It was supposed to accept an `IngredientDescription`! On top of that, because the users didn't specify `BowlType` in `FindBowl`, CookieBot 4 would sometimes use a Strainer instead! Users didn't know what they were supposed to use, and unknowingly wrote faulty code.
+
+CookieBot's engineers quickly find a solution: If they wrote type information into their code, Luau would automatically warn users when they accidentally misused CookieBot functions. This sounds great, but how do we *do* this?
+
+## Type Extensions
+
+So far, we've been writing basic Lua 5.1 code in this tutorial, which is what Luau is based on.
